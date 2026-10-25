@@ -1,0 +1,19 @@
+# Core ML
+torch
+torchvision
+numpy
+pandas
+scikit-learn
+pillow
+tqdm
+
+# Explainability
+grad-cam
+shap
+
+# Plots and dashboard
+matplotlib
+streamlit
+
+# Data download
+kaggle

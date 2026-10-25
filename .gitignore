@@ -1,0 +1,29 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Data and model artifacts (live on Google Drive / local disk, never in git)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+outputs/*
+!outputs/.gitkeep
+*.pt
+*.pth
+*.zip
+*.tar
+*.tar.gz
+
+# Secrets
+kaggle.json
+.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
