@@ -18,3 +18,16 @@ Observations
 - Wildfire is near-solved (F1 ~0.985). Kaggle-tile accuracy (~98.6%) is much higher than Planet (~87-89%); the Kaggle set has a known spatial shortcut (see FINDINGS_FROM_FIRST_ATTEMPT.md), so Planet accuracy is the honest difficulty measure.
 - Caveats: single seed; val macro-F1 fluctuates ~0.02 between epochs; only 266 test Deforestation tiles.
 - Selected configuration for Phases 5-6: **B_aug** (`--aug`, no imbalance handling).
+
+## Phase 3 additions: repeat seeds and second architecture
+| run | model | aug | seed | val macro-F1 | test macro-F1 | Defo F1 | Planet acc |
+|---|---|---|---|---|---|---|---|
+| baseline | MobileNetV3-S | no | 42 | 0.880 | 0.868 | 0.663 | 0.872 |
+| baseline_s7 | MobileNetV3-S | no | 7 | 0.878 | 0.859 | 0.646 | 0.876 |
+| B_aug | MobileNetV3-S | yes | 42 | 0.891 | 0.883 | 0.701 | 0.891 |
+| B_aug_s7 | MobileNetV3-S | yes | 7 | 0.883 | 0.879 | 0.688 | 0.892 |
+| G_resnet18_aug | ResNet18 | yes | 42 | 0.880 | 0.874 | 0.685 | 0.872 |
+
+- Two-seed means: baseline 0.864 macro-F1 / 0.655 Defo F1; augmentation 0.881 / 0.695. Augmentation helps in both seeds (+~0.017 macro-F1, +~0.04 Defo F1); seed ranges do not overlap, but n=2.
+- ResNet18 + aug (0.874) does not beat MobileNetV3-Small + aug and is ~2x slower (about 85 s vs 70 s per epoch on a T4) and much larger (ResNet18 has roughly 11M parameters, MobileNetV3-Small roughly 1.5M).
+- FINAL MODEL: MobileNetV3-Small + augmentation (`B_aug`, seed 42 checkpoint).
