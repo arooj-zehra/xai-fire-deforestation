@@ -31,3 +31,18 @@ Observations
 - Two-seed means: baseline 0.864 macro-F1 / 0.655 Defo F1; augmentation 0.881 / 0.695. Augmentation helps in both seeds (+~0.017 macro-F1, +~0.04 Defo F1); seed ranges do not overlap, but n=2.
 - ResNet18 + aug (0.874) does not beat MobileNetV3-Small + aug and is ~2x slower (about 85 s vs 70 s per epoch on a T4) and much larger (ResNet18 has roughly 11M parameters, MobileNetV3-Small roughly 1.5M).
 - FINAL MODEL: MobileNetV3-Small + augmentation (`B_aug`, seed 42 checkpoint).
+
+## Phase 4: shortcut / per-source check (final model B_aug, 3,866 test tiles)
+| predictor | acc | macro-F1 | Defo F1 | Kaggle within-source macro-F1 | Planet within-source macro-F1 |
+|---|---|---|---|---|---|
+| CNN (B_aug) | 0.950 | 0.883 | 0.701 | 0.986 | 0.817 |
+| colour-stats gradient boosting (8 features) | 0.890 | 0.749 | 0.413 | 0.923 | 0.659 |
+| source-only (majority class per source) | 0.621 | 0.429 | 0.000 | 0.333 | 0.450 |
+
+CNN recall by (class, source): Deforestation|Planet 0.707 (n=266), Normal|Planet 0.932, Normal|Kaggle 0.989, Wildfire|Kaggle 0.983.
+Planet errors: 78 Deforestation tiles called Normal, 82 Normal tiles called Deforestation (no Wildfire predictions on Planet tiles).
+
+Report points
+- The CNN uses image content beyond the data source or global colour: +0.13 macro-F1 over colour statistics overall, +0.16 within Planet.
+- Kaggle Normal-vs-Wildfire is solvable to 92% with 8 colour numbers, consistent with the known spatial/visual shortcut in that dataset; Planet within-source F1 (0.82) is the honest difficulty measure.
+- The model never confuses classes across sources, i.e. it effectively solves two binary tasks and can recognise the source. Option A ensures the label is not determined by source within each dataset.
