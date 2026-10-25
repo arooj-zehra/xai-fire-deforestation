@@ -29,7 +29,7 @@ Observations
 | G_resnet18_aug | ResNet18 | yes | 42 | 0.880 | 0.874 | 0.685 | 0.872 |
 
 - Two-seed means: baseline 0.864 macro-F1 / 0.655 Defo F1; augmentation 0.881 / 0.695. Augmentation helps in both seeds (+~0.017 macro-F1, +~0.04 Defo F1); seed ranges do not overlap, but n=2.
-- ResNet18 + aug (0.874) does not beat MobileNetV3-Small + aug and is ~2x slower (about 85 s vs 70 s per epoch on a T4) and much larger (ResNet18 has roughly 11M parameters, MobileNetV3-Small roughly 1.5M).
+- ResNet18 + aug (0.874) does not beat MobileNetV3-Small + aug and is about 1.2x slower per epoch with augmentation (about 85 s vs 70 s on a T4) and much larger (ResNet18 has roughly 11M parameters, MobileNetV3-Small roughly 1.5M).
 - FINAL MODEL: MobileNetV3-Small + augmentation (`B_aug`, seed 42 checkpoint).
 
 ## Phase 4: shortcut / per-source check (final model B_aug, 3,866 test tiles)
@@ -46,3 +46,21 @@ Report points
 - The CNN uses image content beyond the data source or global colour: +0.13 macro-F1 over colour statistics overall, +0.16 within Planet.
 - Kaggle Normal-vs-Wildfire is solvable to 92% with 8 colour numbers, consistent with the known spatial/visual shortcut in that dataset; Planet within-source F1 (0.82) is the honest difficulty measure.
 - The model never confuses classes across sources, i.e. it effectively solves two binary tasks and can recognise the source. Option A ensures the label is not determined by source within each dataset.
+
+## Phase 5: explainability (B_aug; Grad-CAM on features[-1], SHAP expected-gradients, 63 tiles, CPU)
+Masking test (10 of 49 Grad-CAM cells set to mean colour; 60 correctly classified test tiles): mean confidence drop
+Grad-CAM cells 0.204 vs random cells 0.131; Grad-CAM beats random on 62% of tiles.
+| class | drop (Grad-CAM cells) | drop (random cells) |
+|---|---|---|
+| Normal | 0.055 | 0.022 |
+| Wildfire | 0.055 | 0.012 |
+| Deforestation | 0.501 | 0.357 |
+
+SHAP share per colour channel (R/G/B), correct tiles: Normal 0.33/0.42/0.24, Wildfire 0.34/0.43/0.24, Deforestation 0.33/0.44/0.23.
+
+Findings
+- Deforestation: Grad-CAM and SHAP localise visible clearings (small pink/brown cleared patches) - the proposal's "cleared forest" goal is met.
+- Wildfire: explanations are diffuse. Kaggle "wildfire" tiles are historical burn areas with no localised fire/smoke, and the model is robust to masking 20% of the tile, i.e. it relies on broad context (dense remote forest vs farmland/suburb). This matches the dataset's spatial-shortcut finding. Smoke/fire localisation is NOT demonstrated.
+- Per-channel SHAP is near-identical across classes: no channel-specific story.
+- Errors: several look like label noise (Planet "Deforestation" tiles with no visible clearing; Normal tiles with visible clearings).
+- Caveats: single model/seed, n=60, Grad-CAM resolution is 7x7, SHAP uses 50 background tiles and 50 samples.

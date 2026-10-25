@@ -28,3 +28,19 @@ python scripts/check_env.py
 | `docs/` | Plan, scope rules, decisions |
 
 Read `docs/PLAN.md` first. It has the phases and the scope rules.
+
+## Dashboard (Phase 6)
+
+1. Download `best.pt` from Drive (`xai-fire-deforestation/outputs/B_aug/`) to `outputs\B_aug\best.pt`.
+2. Run from the repo root with the venv active:
+
+```
+streamlit run app/app.py
+```
+
+Upload a 224x224-ish satellite tile (or use "try a random test tile" if `data\processed` exists).
+SHAP is optional and slow on CPU (needs `data\processed` for background tiles).
+
+## Results
+
+See `docs/RESULTS.md` for the experiment grid, the shortcut check, and the explainability findings.
