@@ -8,3 +8,10 @@
 - Pillow needs `ImageFile.LOAD_TRUNCATED_IMAGES = True` for the Kaggle wildfire JPGs.
 - MobileNetV3-Small Grad-CAM candidate layer: last conv block (`activation_17` in the Keras version;
   in torchvision use `model.features[-1]`).
+
+## Update (second attempt): Planet dedup threshold
+- With 24x24 RGB thumbnails, nearest-neighbour mean-abs-difference among 4,000 random Planet tiles ranged
+  smoothly from 0.63 (min) to 3.26 (median); no cluster near 0. Visual check: pairs at 0.6-8.0 are all
+  different places (homogeneous canopy looks alike). A threshold of 3.0 flagged ~21% of tiles, i.e. wrong.
+- Chosen threshold: 0.3 (catches only near-pixel-identical re-saves). The old "<= 3.0" setting depended on
+  a different thumbnail definition and is not reused.

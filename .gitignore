@@ -27,3 +27,6 @@ kaggle.json
 Thumbs.db
 .vscode/
 .idea/
+
+# Smoke-test output
+data/processed_smoke/
